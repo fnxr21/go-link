@@ -16,8 +16,8 @@ func RunServer() {
 	//route
 	http.HandleFunc("/", handler.Shorten)
 	http.HandleFunc("/short/", handler.Redirect)//redirect
-	
 	http.HandleFunc("/table", handler.CheckTable)//table
+	http.HandleFunc("/original-url", handler.OriginUrl)//table
 
 	//testing
 	// http.HandleFunc("/first", handler.RouteIndexGet)
