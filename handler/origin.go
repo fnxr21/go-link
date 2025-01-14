@@ -26,8 +26,8 @@ func OriginUrl(w http.ResponseWriter, r *http.Request) {
 	shortUrl := r.FormValue("short_url")
 	ShortKey := strings.TrimPrefix(shortUrl, baseURL)
 
-	mapMutex.Lock()
-	defer mapMutex.Unlock()
+	// mapMutex.Lock()
+	// mapMutex.Unlock()
 
 	if originalURL, exist := urlMap[ShortKey]; exist {
 		//long url already save return same url and key

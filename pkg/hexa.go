@@ -2,8 +2,6 @@ package pkg
 
 import (
 	"crypto/rand"
-	"encoding/hex"
-	"fmt"
 	"math/big"
 )
 
@@ -21,10 +19,3 @@ func GenerateHexKey() string {
 }
 
 
-func DecodeHexKey(hexKey string) ([]byte, error) {
-	decoded, err := hex.DecodeString(hexKey)
-	if err != nil {
-		return nil, fmt.Errorf("failed to decode hex key: %v", err)
-	}
-	return decoded, nil
-}
