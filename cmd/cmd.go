@@ -11,14 +11,15 @@ import (
 )
 
 func RunServer() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	http.HandleFunc("/", handler.Shorten)
-	http.HandleFunc("/table", handler.CheckTable)
+	dotEnv()
 
-	http.HandleFunc("/short/", handler.Redirect)
+	//route
+	http.HandleFunc("/", handler.Shorten)
+	http.HandleFunc("/short/", handler.Redirect)//redirect
+	
+	http.HandleFunc("/table", handler.CheckTable)//table
+
+	//testing
 	// http.HandleFunc("/first", handler.RouteIndexGet)
 	// http.HandleFunc("/process", handler.RouteSubmitPost)
 
@@ -30,5 +31,12 @@ func RunServer() {
 
 	if err := http.ListenAndServe(":"+PORT, nil); err != nil {
 		fmt.Println("Error starting server:", err)
+	}
+}
+
+func dotEnv()  {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
 }
