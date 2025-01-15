@@ -10,8 +10,6 @@ import (
 	"github.com/fnxr21/go-link/pkg"
 )
 
-
-
 type UrlShortener struct {
 	urlMap     map[string]string
 	reverseMap map[string]string
@@ -37,19 +35,35 @@ func (u *UrlShortener) Shorten(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	//make sure is post
-	if r.Method != "POST" {
-		http.Error(w, "Wrong Method", http.StatusInternalServerError)
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
 
-	//use formvalue
+	//get the original URL from the form
 	originalURL := r.FormValue("url")
+	if originalURL == "" {
+		http.Error(w, "URL is required", http.StatusBadRequest)
+		return
+	}
 
-	//lock c
+	//lock trancation
+	// make sure thats not gonna make race connditon for making new url in same time
 	u.mutex.Lock()
 	defer u.mutex.Unlock()
 
-	// // is more fast than use loop for scaning by row
+	//is not good for computing is better acces direct
+	//  for shortURL, storedURL := range urlMap {
+	//     if storedURL == longURL {
+	//         response := map[string]string{"shortURL": baseURL + shortURL}
+	//         json.NewEncoder(w).Encode(response)
+	//         return
+	//     }
+	// }
+
+	// is more fast than use loop for scaning by row like above
+
+	// Check if the original URL already has a shortened URL
 	if shortURL, exist := u.reverseMap[originalURL]; exist {
 		//long url already save return same url and key
 		response := map[string]string{"url": originalURL, "short_url": u.baseURL + shortURL}
@@ -60,7 +74,8 @@ func (u *UrlShortener) Shorten(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-
+	
+	// generate unique short URL
 	var shortURL string
 	for {
 		shortURL = pkg.GenerateHexKey()
@@ -69,7 +84,7 @@ func (u *UrlShortener) Shorten(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	// Store in the maps
+	// Store in the hashmap
 	u.urlMap[shortURL] = originalURL
 	u.reverseMap[originalURL] = shortURL
 
@@ -84,21 +99,12 @@ func (u *UrlShortener) Shorten(w http.ResponseWriter, r *http.Request) {
 }
 
 
-//is not good for computing
-//  for shortURL, storedURL := range urlMap {
-//     if storedURL == longURL {
-//         response := map[string]string{"shortURL": baseURL + shortURL}
-//         json.NewEncoder(w).Encode(response)
-//         return
-//     }
+// type UrlShortener struct {
+// 	urlMap     map[string]string
+// 	reverseMap map[string]string
+// 	mutex      sync.RWMutex
+// 	baseURL    string
 // }
-
-
-// var (
-// 	urlMap     = make(map[string]string)
-// 	reverseMap = make(map[string]string)
-// 	mapMutex   = sync.RWMutex{} // Mutex for safe concurrent access
-// )
 
 
 // func Shorten(w http.ResponseWriter, r *http.Request) {

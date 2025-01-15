@@ -6,25 +6,26 @@ import (
 )
 
 type UrlData struct {
-	ShortURL string
+	Key      string
 	LongURL  string
-	Reversed string
+	ShortURL string
 }
 
 func (u *UrlShortener) CheckTable(w http.ResponseWriter, r *http.Request) {
 	//mapMutex.RLock // Lock for reading maps safely
-	// 	defer mapMutex.RUnlock // unlock
+	// 	defer mapMutex.RUnlock  //unlock after this function done
 	u.mutex.RLock()
 	defer u.mutex.RUnlock()
 
 	// Prepare data for the template
 	var data []UrlData
-
-	for shortURL, longURL := range u.urlMap {
+	for keyURL, longURL := range u.urlMap {
+		// populate data with short and long URLs, and the reversed key
 		data = append(data, UrlData{
-			ShortURL: shortURL,
+			Key:      keyURL,
 			LongURL:  longURL,
-			Reversed: u.reverseMap[longURL], // Get the reversed value from reverseMap
+			ShortURL: u.baseURL + keyURL,
+			// Reversed: u.reverseMap[longURL], // get the reversed value from reverseMap
 		})
 	}
 
