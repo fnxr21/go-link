@@ -13,20 +13,19 @@ import (
 func RunServer() {
 	dotEnv()
 
-	//route
-	http.HandleFunc("/", handler.Shorten)
-	http.HandleFunc("/short/", handler.Redirect) //redirect
-	http.HandleFunc("/original-url", handler.OriginUrl) //table
-	http.HandleFunc("/table", handler.CheckTable) //table
+	handler := handler.NewUrlshortener()
 
-	//testing
-	// http.HandleFunc("/first", handler.RouteIndexGet)
-	// http.HandleFunc("/process", handler.RouteSubmitPost)
+	//route
+	http.HandleFunc("/", handler.Shorten)               //shorten url
+	http.HandleFunc("/short/", handler.Redirect)        //redirect
+	http.HandleFunc("/original-url", handler.OriginUrl) //original url
+	http.HandleFunc("/table", handler.CheckTable)       //table
 
 	PORT := os.Getenv("APP_PORT")
 	if PORT == "" {
 		PORT = "8080"
 	}
+	
 	fmt.Println("Server started at http://localhost:" + PORT)
 
 	if err := http.ListenAndServe(":"+PORT, nil); err != nil {
@@ -34,7 +33,7 @@ func RunServer() {
 	}
 }
 
-func dotEnv()  {
+func dotEnv() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")

@@ -8,6 +8,7 @@ import (
 
 func GenerateHexKey() string {
 	const charset = "0123456789abcdef"
+	//  generate 1,048,576 unique keys as maximal.
 	const keyLength = 5
 
 	var shortKey []byte

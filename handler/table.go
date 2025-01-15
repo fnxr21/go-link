@@ -11,27 +11,22 @@ type UrlData struct {
 	Reversed string
 }
 
-func CheckTable(w http.ResponseWriter, r *http.Request) {
-	mapMutex.Lock()
-
-	defer mapMutex.Unlock()
+func (u *UrlShortener) CheckTable(w http.ResponseWriter, r *http.Request) {
+	//mapMutex.RLock // Lock for reading maps safely
+	// 	defer mapMutex.RUnlock // unlock
+	u.mutex.RLock()
+	defer u.mutex.RUnlock()
 
 	// Prepare data for the template
 	var data []UrlData
-	mapMutex.RLock() // Lock for reading maps safely
 
-	// Iterate through urlMap and reverseMap to create a list of data
-	for shortURL, longURL := range urlMap {
+	for shortURL, longURL := range u.urlMap {
 		data = append(data, UrlData{
 			ShortURL: shortURL,
 			LongURL:  longURL,
-			Reversed: reverseMap[longURL], // Get the reversed value from reverseMap
+			Reversed: u.reverseMap[longURL], // Get the reversed value from reverseMap
 		})
 	}
-	mapMutex.RUnlock()
-
-	// Parse and execute the template
-	// tmpl, err := template.New("table_url").Parse("view/view.html")
 
 	var tmpl = template.Must(template.New("table_url").ParseFiles("view/view.html"))
 

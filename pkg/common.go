@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Alphanumeric or base 64
+// generate random string
 func GenerateShortKey() string {
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	const keyLength = 6
