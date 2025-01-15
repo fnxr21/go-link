@@ -2,6 +2,10 @@
 
 This is a URL shortening service built using Go (Golang). The web service allows users to shorten long URLs for easy sharing.
 
+Link
+[Postmant](https://crimson-crater-385688.postman.co/workspace/Open~b2b49bd4-fdb3-472f-ae87-d815a933728a/collection/27541101-4eb257df-70a9-45ec-888c-f74c49f42a34)
+[GitHub](https://github.com/fnxr21/short-url)
+
 ## Run in Local
 
 Clone the repository
