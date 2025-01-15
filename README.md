@@ -1,4 +1,4 @@
-# Short short_url
+# Short URL
 
 This is a URL shortening service built using Go (Golang). The web service allows users to shorten long URLs for easy sharing.
 
