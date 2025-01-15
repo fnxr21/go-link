@@ -4,18 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
-	// "path"
-	"sync"
 
 	"github.com/fnxr21/go-link/pkg"
 )
-
-type UrlShortener struct {
-	urlMap     map[string]string
-	reverseMap map[string]string
-	mutex      sync.RWMutex
-	baseURL    string
-}
 
 func NewUrlshortener() *UrlShortener {
 
@@ -40,9 +31,16 @@ func (u *UrlShortener) Shorten(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//get the original URL from the form
-	originalURL := r.FormValue("url")
-	if originalURL == "" {
+	var requestData RequestLongURL
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&requestData)
+	if err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	// Check if URL is provided
+	if requestData.URL == "" {
 		http.Error(w, "URL is required", http.StatusBadRequest)
 		return
 	}
@@ -64,9 +62,13 @@ func (u *UrlShortener) Shorten(w http.ResponseWriter, r *http.Request) {
 	// is more fast than use loop for scaning by row like above
 
 	// Check if the original URL already has a shortened URL
-	if shortURL, exist := u.reverseMap[originalURL]; exist {
+	if shortURL, exist := u.reverseMap[requestData.URL]; exist {
 		//long url already save return same url and key
-		response := map[string]string{"url": originalURL, "short_url": u.baseURL + shortURL}
+		response := ResponseURL{
+			URL:      requestData.URL,
+			ShortURL: u.baseURL + shortURL,
+		}
+
 		if err := json.NewEncoder(w).Encode(response); err != nil {
 			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 			return
@@ -74,8 +76,8 @@ func (u *UrlShortener) Shorten(w http.ResponseWriter, r *http.Request) {
 		return
 
 	}
-	
-	// generate unique short URL
+
+	// generate unique shortURL
 	var shortURL string
 	for {
 		shortURL = pkg.GenerateHexKey()
@@ -85,10 +87,12 @@ func (u *UrlShortener) Shorten(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Store in the hashmap
-	u.urlMap[shortURL] = originalURL
-	u.reverseMap[originalURL] = shortURL
-
-	response := map[string]string{"url": originalURL, "short_url": u.baseURL + shortURL}
+	u.urlMap[shortURL] = requestData.URL
+	u.reverseMap[requestData.URL] = shortURL
+	response := ResponseURL{
+		URL:      requestData.URL,
+		ShortURL: u.baseURL + shortURL,
+	}
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
@@ -98,14 +102,12 @@ func (u *UrlShortener) Shorten(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 // type UrlShortener struct {
 // 	urlMap     map[string]string
 // 	reverseMap map[string]string
 // 	mutex      sync.RWMutex
 // 	baseURL    string
 // }
-
 
 // func Shorten(w http.ResponseWriter, r *http.Request) {
 // 	w.Header().Set("Content-Type", "application/json")

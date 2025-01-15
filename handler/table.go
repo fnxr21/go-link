@@ -13,7 +13,7 @@ type UrlData struct {
 
 func (u *UrlShortener) CheckTable(w http.ResponseWriter, r *http.Request) {
 	//mapMutex.RLock // Lock for reading maps safely
-	// 	defer mapMutex.RUnlock  //unlock after this function done
+	// 	defer mapMutex.RUnlock  // unlock after this function done
 	u.mutex.RLock()
 	defer u.mutex.RUnlock()
 
