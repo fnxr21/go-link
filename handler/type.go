@@ -1,6 +1,9 @@
 package handler
 
-import "sync"
+import (
+	"os"
+	"sync"
+)
 
 type (
 	UrlShortener struct {
@@ -20,3 +23,18 @@ type (
 		ShortURL string `json:"short_url"`
 	}
 )
+
+
+func NewUrlshortener() *UrlShortener {
+
+	baseURL := os.Getenv("BASE_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost:8080/short/"
+	}
+
+	return &UrlShortener{
+		urlMap:     make(map[string]string),
+		reverseMap: make(map[string]string),
+		baseURL:    baseURL,
+	}
+}

@@ -3,24 +3,10 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"os"
 
 	"github.com/fnxr21/go-link/pkg"
 )
 
-func NewUrlshortener() *UrlShortener {
-
-	baseURL := os.Getenv("BASE_URL")
-	if baseURL == "" {
-		baseURL = "http://localhost:8080/short/"
-	}
-
-	return &UrlShortener{
-		urlMap:     make(map[string]string),
-		reverseMap: make(map[string]string),
-		baseURL:    baseURL,
-	}
-}
 
 func (u *UrlShortener) Shorten(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
